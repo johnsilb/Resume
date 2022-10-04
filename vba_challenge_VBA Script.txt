@@ -1,0 +1,152 @@
+Sub ticker_challenge()
+
+    'variable declarations
+    
+    Dim Row_Range As Long
+    Dim current_ticker As String
+    Dim next_ticker As String
+    Dim ticker_row As Long
+    Dim YC_start As Double
+    Dim YC_end As Double
+    Dim yearly_change As Double
+    Dim YC_percent As Double
+    Dim report_row As Integer
+    Dim stock_volume As Double
+    Dim GPI_ticker As String
+    Dim GPI_value As Double
+    Dim GPD_ticker As String
+    Dim GPD_value As Double
+    Dim GTV_ticker As String
+    Dim GTV_value As Double
+    
+                                
+    'initialize counters and accumulators and other numerical variables
+    
+    Row_Range = 0
+    ticker_row = 2
+    YC_start = 0
+    YC_end = 0
+    yearly_change = 0
+    YC_percent = 0
+    report_row = 2
+    stock_volume = 0
+    GPI_value = 0
+    GPD_value = 0
+    GTV_value = 0
+    
+                    
+    'column headings
+    
+    
+    Range("J1").Value = "Ticker"
+    Range("K1").Value = "Yearly Change"
+    Columns("k").ColumnWidth = 25
+    Range("L1").Value = "Percent Change"
+    Columns("l").ColumnWidth = 25
+    Range("M1").Value = "Total Stock Volume"
+    Columns("m").ColumnWidth = 25
+    Range("j1:m1").HorizontalAlignment = xlCenter
+    Range("j1:m1").Font.FontStyle = "bold"
+    
+    'Procedure
+    
+    Row_Range = ActiveSheet.UsedRange.Rows.Count
+    YC_start = Cells(2, 3).Value
+    Range("J:M").HorizontalAlignment = xlCenter
+    
+    For i = 2 To Row_Range
+    
+        stock_volume = stock_volume + Cells(ticker_row, 7).Value
+        current_ticker = Cells(i, 1).Value
+        next_ticker = Cells(i + 1, 1).Value
+        
+        If next_ticker <> current_ticker Then
+        
+            Cells(report_row, 10).Value = current_ticker
+            YC_end = Cells(ticker_row, 6)
+            yearly_change = YC_end - YC_start
+            YC_percent = yearly_change / YC_end
+            Cells(report_row, 11).Value = yearly_change
+            Cells(report_row, 12).Value = YC_percent
+            Cells(report_row, 13).Value = stock_volume
+            YC_start = Cells(ticker_row + 1, 3)
+            
+            'Format Cells
+            
+            If yearly_change < 0 Then
+                
+                    Cells(report_row, 11).Interior.ColorIndex = 3
+                    
+            ElseIf yearly_change >= 0 Then
+            
+                    Cells(report_row, 11).Interior.ColorIndex = 4
+                    
+            End If
+            
+            
+            Cells(report_row, 12).NumberFormat = "0.00%"
+            Cells(report_row, 13).NumberFormat = "#,##0"
+            
+            
+            'increment counters, reset accumulator
+            
+            report_row = report_row + 1
+            ticker_row = ticker_row + 1
+            stock_volume = 0
+            
+        Else
+        
+            ticker_row = ticker_row + 1
+                    
+        End If
+        
+     Next i
+     
+    report_row = 2
+    
+    'identify superlatives
+    
+    For i = report_row To Row_Range
+    
+        If Cells(i, 12) > GPI_value Then
+            
+            GPI_value = Cells(i, 12).Value
+            GPI_ticker = Cells(i, 10).Value
+            
+        ElseIf Cells(i, 12) < GPD_value Then
+            
+            GPD_value = Cells(i, 12)
+            GPD_ticker = Cells(i, 10).Value
+            
+        End If
+    
+    Next i
+    
+    For i = report_row To Row_Range
+        
+        If Cells(i, 13).Value > GTV_value Then
+        
+            GTV_value = Cells(i, 13).Value
+            GTV_ticker = Cells(i, 10).Value
+            
+        End If
+        
+    Next i
+    
+    'Output results
+    
+    Cells(1, 16).Value = "Ticker"
+    Cells(1, 17).Value = "Value"
+    Cells(2, 15).Value = "Greatest % Increase"
+    Cells(2, 16).Value = GPI_ticker
+    Cells(2, 17).Value = GPI_value
+    Cells(3, 15).Value = "Greatest % Decrease"
+    Cells(3, 16).Value = GPD_ticker
+    Cells(3, 17).Value = GPD_value
+    Cells(4, 15).Value = "Greatest Total Volume"
+    Cells(4, 16).Value = GTV_ticker
+    Cells(4, 17).Value = GTV_value
+    Columns("o").ColumnWidth = 25
+    
+    
+End Sub
