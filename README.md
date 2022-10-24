@@ -1,2 +1,2 @@
-# johnsilb_bootcamp
-doing this with the class
+figuring stuff out.
+
